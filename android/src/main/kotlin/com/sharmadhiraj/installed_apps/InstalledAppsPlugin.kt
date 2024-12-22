@@ -28,52 +28,28 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import java.util.Locale.ENGLISH
 
-class InstalledAppsPlugin() : MethodCallHandler, FlutterPlugin, ActivityAware {
+class InstalledAppsPlugin() : MethodCallHandler, FlutterPlugin, ActivityAware  {
 
-    companion object {
+    /// The MethodChannel that will the communication between Flutter and native Android
+    ///
+    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+    /// when the Flutter Engine is detached from the Activity
+    private lateinit var channel : MethodChannel
+    private lateinit var context: Context
 
-        var context: Context? = null
-
-        @JvmStatic
-        fun registerWith(registrar: Registrar) {
-            context = registrar.context()
-            register(registrar.messenger())
-        }
-
-        @JvmStatic
-        fun register(messenger: BinaryMessenger) {
-            val channel = MethodChannel(messenger, "installed_apps")
-            channel.setMethodCallHandler(InstalledAppsPlugin())
-        }
-    }
-
-    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        register(binding.binaryMessenger)
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "installed_apps")
+        channel.setMethodCallHandler(this)
+        context = flutterPluginBinding.applicationContext
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
     }
-
-    override fun onAttachedToActivity(activityPluginBinding: ActivityPluginBinding) {
-        context = activityPluginBinding.activity
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {}
-
-    override fun onReattachedToActivityForConfigChanges(activityPluginBinding: ActivityPluginBinding) {
-        context = activityPluginBinding.activity
-    }
-
-    override fun onDetachedFromActivity() {}
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        if (context == null) {
-            result.error("", "Something went wrong!", null)
-            return
-        }
         when (call.method) {
             "getInstalledApps" -> {
                 val includeSystemApps = call.argument("exclude_system_apps") ?: true
