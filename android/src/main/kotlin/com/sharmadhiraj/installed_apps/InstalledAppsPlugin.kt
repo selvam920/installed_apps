@@ -22,7 +22,6 @@ import android.widget.Toast.LENGTH_SHORT
 import com.sharmadhiraj.installed_apps.Util.Companion.convertAppToMap
 import com.sharmadhiraj.installed_apps.Util.Companion.getPackageManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -30,7 +29,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import java.util.Locale.ENGLISH
 
-class InstalledAppsPlugin() : MethodCallHandler, FlutterPlugin, ActivityAware  {
+class InstalledAppsPlugin() : MethodCallHandler, FlutterPlugin  {
 
     /// The MethodChannel that will the communication between Flutter and native Android
     ///
